@@ -32,7 +32,7 @@ jobs:
         with:
           name: cfn-lab-network
           template: cfn/network.yaml
-          parameter-overrides: "ExportPrefix=${{ env.EXPORT_PREFIX }},InstanceType=t3.micro"
+          parameter-overrides: "StackExportPrefix=${{ env.EXPORT_PREFIX }}"
           no-fail-on-empty-changeset: "1"
 
       - name: Deploy ec2 stack
@@ -42,4 +42,3 @@ jobs:
           template: cfn/ec2.yaml
           parameter-overrides: "ExportPrefix=${{ env.EXPORT_PREFIX }},InstanceType=t3.micro"
           no-fail-on-empty-changeset: "1"
-
