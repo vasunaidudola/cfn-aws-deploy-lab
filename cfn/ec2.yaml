@@ -8,10 +8,6 @@ Parameters:
   InstanceType:
     Type: String
     Default: t3.micro
-  KeyName:
-    Type: AWS::EC2::KeyPair::KeyName
-    Default: ""
-    Description: Optional key pair name for SSH; leave empty to skip SSH
   AmiSsmParam:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64
@@ -20,12 +16,11 @@ Resources:
   SecGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow HTTP (80) and SSH (22) from anywhere (lab)
+      GroupDescription: Allow HTTP (80) from anywhere (lab)
       VpcId: !ImportValue
         'Fn::Sub': '${ExportPrefix}-VpcId'
       SecurityGroupIngress:
         - { IpProtocol: tcp, FromPort: 80, ToPort: 80, CidrIp: 0.0.0.0/0 }
-        - { IpProtocol: tcp, FromPort: 22, ToPort: 22, CidrIp: 0.0.0.0/0 }
 
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -35,7 +30,6 @@ Resources:
       SubnetId: !ImportValue
         'Fn::Sub': '${ExportPrefix}-PublicSubnetId'
       SecurityGroupIds: [!Ref SecGroup]
-      KeyName: !If [HasKey, !Ref KeyName, !Ref 'AWS::NoValue']
       UserData:
         'Fn::Base64': !Sub |
           #!/bin/bash
@@ -47,11 +41,7 @@ Resources:
       Tags:
         - { Key: Name, Value: cfn-lab-ec2 }
 
-Conditions:
-  HasKey: !Not [!Equals [!Ref KeyName, ""]]
-
 Outputs:
   InstanceId: { Value: !Ref EC2Instance }
   PublicIP:    { Value: !GetAtt EC2Instance.PublicIp }
   Url:         { Value: !Sub 'http://${EC2Instance.PublicIp}' }
-
