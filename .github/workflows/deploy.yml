@@ -31,7 +31,7 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: cfn-lab-network
-          template: cfn/01-network.yaml
+          template: cfn/network.yaml
           parameter-overrides: "StackExportPrefix=${{ env.EXPORT_PREFIX }}"
           no-fail-on-empty-changeset: "1"
 
@@ -39,7 +39,7 @@ jobs:
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: cfn-lab-ec2
-          template: cfn/02-ec2.yaml
+          template: cfn/ec2.yaml
           parameter-overrides: "ExportPrefix=${{ env.EXPORT_PREFIX }},InstanceType=t3.micro,KeyName="
           no-fail-on-empty-changeset: "1"
 
