@@ -1,0 +1,45 @@
+name: Deploy CloudFormation (network + ec2)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+  EXPORT_PREFIX: labdemo
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::504956527880:role/GitHubActionsCfnRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy network stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: cfn-lab-network
+          template: cfn/01-network.yaml
+          parameter-overrides: "StackExportPrefix=${{ env.EXPORT_PREFIX }}"
+          no-fail-on-empty-changeset: "1"
+
+      - name: Deploy ec2 stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: cfn-lab-ec2
+          template: cfn/02-ec2.yaml
+          parameter-overrides: "ExportPrefix=${{ env.EXPORT_PREFIX }},InstanceType=t3.micro,KeyName="
+          no-fail-on-empty-changeset: "1"
+
