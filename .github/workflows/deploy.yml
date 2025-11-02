@@ -40,6 +40,6 @@ jobs:
         with:
           name: cfn-lab-ec2
           template: cfn/ec2.yaml
-          parameter-overrides: "ExportPrefix=${{ env.EXPORT_PREFIX }},InstanceType=t3.micro,KeyName="
+          parameter-overrides: "ExportPrefix=${{ env.EXPORT_PREFIX }},InstanceType=t3.micro"
           no-fail-on-empty-changeset: "1"
 
